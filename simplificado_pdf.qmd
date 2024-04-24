@@ -1,0 +1,384 @@
+---
+title: "Modelo Relatório Cientifico Quarto em formato pdf"
+subtitle: "Aplicação às Aulas de Estatística e Bioestatística"
+abstract: Este documento serve de estrutura básica para desenvolver análises estatísticas ao longo deste curso, utilizando o sistema Quarto. Quarto® é um sistema de publicação científica e técnica de código aberto construído em Pandoc para Programação Literária (Literate Programming). Códigos, textos, títulos, subtítulos, imagens e muitos outros elementos podem ser reunidos e produzirem um formato de saída bem interessante para as suas análises (formato html, pdf, ppt, word, etc.). Desenvolvemos este modelo para o formato pdf, que é uma forma majoritariamente usada nos trabalhos científicos.
+title-block-banner: true
+author: Evaldo Silva
+date: "`r format(Sys.time(), '%m, %d, %Y')`"
+format: 
+  pdf:
+    toc: true
+    keep-tex: true
+    number-sections: true
+    number-depth: 3
+    highlight-style: espresso  # dracula, github, expresso
+    mainfont: Times New Roman
+    sansfont: Latin Modern Roman
+crossref:
+  tbl-title: "**Tabela**"
+  tbl-labels: arabic
+  fig-title: '**Figura**'
+  fig-labels: arabic
+  title-delim: "**.**"
+execute: 
+  echo: false
+  warning: false
+  message: false
+editor: visual
+lang: pt-BR
+geometry: "a4paper, left=2.5cm, right=2.0cm, top=2.0cm, bottom=2.5cm"
+bibliography: references.bib
+csl: food-chemistry.csl
+editor_options: 
+  chunk_output_type: console
+---
+
+<!--# Vamos inserir abaixo nosso primero chunk (pedaço) de código da linguagem R. Este texto é apenas um comentário e não sairá após renderização do documento final. Digite Ctrl + Alt + I para inserir um chunk na linha abaixo -->
+
+```{r}
+#| label: setup
+#| echo: false
+#| warning: false
+#| message: false
+
+# Seguem abaixo ajustes globais para os chunks
+# & Carregamento das principais bibliotecas
+
+# 1) -----  Ajustes globais para os chunks---------------
+knitr::opts_chunk$set(echo = FALSE, 
+											warning = FALSE, 
+											message = FALSE, 
+											out.width = "70%",
+											fig.align = "center",
+                      dev = "png", 
+											comment = "  ",
+											fig.pos = "!ht", # Previne fig flutuar
+											fig.path = "plots/") # Local salvar os plots
+
+# 2) -----  Carregamento de bibliotecas (ou pacotes) ------
+library(knitr)
+library(rmarkdown)
+library(kableExtra)
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(here)
+library(car)
+library(psych)
+library(ggpubr)
+library(gt)
+library(jtools)
+
+# 3) -----  Carregamento de funções em script.R -------
+source("./codes/funcoes_proprias.R")
+```
+
+\newpage
+
+# Introdução {#sec-intro}
+
+A integração eficaz de dados, análises e interpretação em um único fluxo de trabalho é essencial para o avanço da pesquisa científica e da educação estatística. Com o advento de plataformas de publicação científica, como o Quarto®, que é uma ferramenta de código aberto baseada em Pandoc, essa integração torna-se não apenas possível, mas também acessível a um público mais amplo. O Quarto permite que textos, imagens e códigos sejam combinados de forma harmoniosa em documentos finais, promovendo uma abordagem interativa e integrada ao aprendizado e à divulgação científica.
+
+Nesse contexto, o objetivo deste documento foi desenvolver um modelo simplificado destinado à execução de análises estatísticas variadas, em que os usuários podem carregar seus próprios conjuntos de dados, realizar análises pertinentes e discutir os resultados obtidos, tudo dentro da filosofia da Programação Literária. A Programação Literária combina código e narrativa em um documento, facilitando a compreensão e colaboração. Ideal para análises estatísticas e ensino, promove uma abordagem integrada ao aprendizado, permitindo exploração interativa de dados e conceitos por meio de exemplos reais e explicativos.
+
+Os usuários podem selecionar os pacotes específicos da linguagem R que melhor se adequam ao tipo de análise desejada, o que requer a necessidade de pesquisar e compreender códigos em R apropriados para a análise ou teste estatístico específico em questão. Adicionalmente, este documento proporciona orientações práticas sobre a estruturação eficiente de pastas e arquivos, facilitando o trabalho não apenas individual, mas também colaborativo em projetos de natureza estatística.
+
+Nas próximas seções, explicaremos como utilizar esses códigos de execução em Linguagem R, além de organizar todo o projeto de análise em uma pasta individual. Através deste modelo guia, buscamos não só facilitar o processo de análise estatística, mas também promover a Programação Literária como um meio eficaz de educação e comunicação científica.
+
+**Substituição da Introdução:**
+
+Quando fizer a adaptação à sua análise específica, todo o texto desta introdução pode ser substituído. Recomenda-se que a (o) cientistica apresente os seguintes pontos:
+
+-   **Assunto e questão-problema**: Defina o foco e a problemática do seu estudo.
+-   **Revisão de literatura**: Apresente o que já foi explorado sobre o tema.
+-   **Hipóteses de pesquisa**: Proponha suposições baseadas em estudos anteriores.
+-   **Objetivo**: Esclareça o propósito do seu trabalho.
+
+**Referências bibliográficas**:
+
+Para empregar referências bibliográficas em documento Quarto, utilize o dados do gerenciador de referências Zotero, ou bases como PubMed, Crossref, DiteCite, assim como referências aos proprios pacotes do R. Para incluir uma citação, acesse o menu `Insert –> Citation` e cite a referência do seu estudo. Neste exemplo, em meus estudos sobre quitosana, podemos fazer como num editor de texto comum: *as quitinas/quitosanas são biopolímeros mais abundantes na natureza após a celulose [@dash2011; @agboh1997]*. *De acordo com @Abreu2013a,* ... Sobre as referências, há ainda dois pontos que queremos destacar:
+
+-   **Gerenciador de referências**: O Quarto oferece compatibilidade com o gerenciador de referências bibliográficas Zotero. Se você prefere usar outros gerenciadores gratuitos como o Mendeley, vale notar que, atualmente, o Mendeley não se integra diretamente ao RStudio. No entanto, existe uma solução alternativa. Primeiro, instale o Zotero e crie sua conta na web. Depois, importe a referências do Mendeley para o Zotero. Finalmente, dentro do RStudio, acesse `Global options`, clique na aba `Rmarkdown` e, na sub-aba `Citations`, insira o caminho do local de armazenamento do Zotero no seu computador, normalmente localizado em: C:/Users/Nome_Usuario/Zotero. Além desse procedimento, o Zotero pode importar dados de um arquivo bibtex (`*.bib`). Esses procedimentos permitem o gerenciamento eficaz de suas referências diretamente no RStudio.
+
+-   **Estilo da revista**. É possível mudar o estilo de saída para um determinado periódico ao incluir no YAML o nome do seu arquivo csl. Para baixar estilos (`csl styles`), vá neste link de estilos no [github](https://github.com/citation-style-language/styles) e baixe o estilo de citação de sua revista. Após baixar o arquivo csl, coloque-o na mesta pasta onde se encontra o arquivo `.qmd`. Para este manuscrito, baixamos o estilo da revista Food Chemistry.
+
+# Metodologia
+
+## Inserindo uma imagem
+
+Os caranguejos com os quais trabalhamos foram da espécie Ucides cordatus (@fig-crab), machos e fêmeas. A captura ocorreu nos períodos chuvoso e seco, e nas localidade de Caratateua e Ajuruteua, Município de Bragança-PA. Esta imagem foi inserida usando o menu `insert –> Figure/Image` e depois inserida a sua legenda e ID.
+
+![Exemplar do caranguejo Ucides cordatus](images/Ucides_cordatus.png){#fig-crab width="60%"}
+
+## Importando dados
+
+A @tbl-caranguejo abaixo representa os dados brutos e foi exibida a título ilustrativo, com os dados distribuindo-se em várias páginas navegáveis. Poderíamos importar dados de outras fontes, como os comente usados arquivos `.csv` ou carregar dados de pacotes do R. Os dados abaixo usaram o pacote readxl que mantém a estrutura do `tidyverse`.
+
+```{r}
+#| label: tbl-caranguejo
+#| tbl-cap: "Morfometria de Ucides cordatus"
+#| tbl-pos: H
+
+
+caranguejo <- read_excel("dados/aulas_bioestatistica.xlsx", sheet = 10) |> 
+  clean_names() 
+
+set.seed(123) # Garante que o resultado seja o mesmo a cada execução
+caranguejo |> 
+  sample_n(size = 10) |>  # sorteia 10 linhas do dataframe
+  kbl()                   # Exibe em formato de tabela
+```
+
+## Análise estatística
+
+Neste seção, mostro como inserir referências aos pacotes utilizados na Linguagem R. Por exempo, as figuras deste manuscrito foram feitas usando o pacote ggplot2 [@ggplot2], enquanto a maioria das tabelas foram formatadas usando o pacote [@kableExtra].
+
+## Inserção de Equações
+
+A relação *peso vs comprimento* foi avaliada conforme o modelo de potência segundo a equação abaixo.
+
+$$ P = a*L^b $$ {#eq-peso_comp}
+
+Segue uma equação mais complexa (@eq-correl):
+
+$$ 
+r=\frac{\sum (x_{i}-\overline x)\sum (y_{i}-\overline y)} {\sqrt{\sum (x_i - \overline{x})^2 )(\sum(y_i - \overline{y})^2})}  
+$$ {#eq-correl}
+
+**Equação em linha**. Uma equação mais simples pode ser colocada em linha, como esta da área de uma cirdcunferência: $A=µr^2$.
+
+# Resultados
+
+## Dados transformados
+
+Mostramos abaixo os códigos utilizados para transformar os dados em um resumo estatístico e apresentá-los numa tabela formatada (@tbl-transf). Para isso, foi preciso inserir o chunk de código em R abaixo.
+
+```{r}
+#| echo: true 
+#| label: tbl-transf 
+#| tbl-cap: "Resumo estatístico dos dados de morfometria do U. cordatus" 
+#| tbl-pos: H   
+
+dados_trans <- caranguejo |>  
+  filter(local == "Ajuruteua") |> 
+  group_by(estacao, sexo) |> 
+  summarise(Contagem = n(), 
+            Média = round(mean(lc, na.rm = T), 2),             
+            SD    = round(sd(lc, na.rm = T), 2)) |>    
+  ungroup()    
+
+kbl(dados_trans)
+```
+
+## Códigos em linha
+
+Além de poder inserir códigos da linguagem R usando chunks, é possível colocar pequenos códigos na linha de texto (`inline`) para saída simples de dados. Ex.: a média do comprimento da carapaça de todos os caranguejos foi de **`r round(mean(caranguejo$cc),2)`** mm. O número total de caranguejos foi de **`r nrow(caranguejo)`**.
+
+## Inserindo gráfico
+
+A @fig-ucides é uma maneira de inserir figuras feitas usando funções e códigos do R, como as do pacote ggplot2. Para referenciar, lembre-se de criar um `label` e o `fig-cation` nas opções de controle de chunks.
+
+```{r}
+#| label: fig-ucides
+#| fig-cap: Regressão linear entre medidas morfométricas de U. cordatus
+#| out-width: 70%
+#| fig-dpi: 300
+
+# Cria o gráfico 
+caranguejo |> 
+  filter(local == "Ajuruteua" & estacao == "Seca") |> 
+  ggplot(aes(x = lc, y = cc, color =  sexo)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm") +
+  labs(x = "Largura da carapaça (mm)", 
+       y = "Comprimento da carapaça (mm)",
+       color = NULL) +
+  theme_minimal()
+```
+
+## Nota de ajustes de saída do formato do gráfico
+
+Também é possível fazer diversos ajustes e controles de saída do formato de gráficos e de imagens, desde seu tamanho, resolução, legenda, etc. Na @fig-ucides acima, foram utilizados os códigos da linguagem R para gerar a imagem em si, assim como as seguintes oções de chunk:
+
+-   #\| echo: true
+-   #\| label: fig-ucides
+-   #\| fig-cap: Regressão linear entre medidas morfométricas de U. cordatus
+-   #\| out-width: 70%
+-   #\| fig-dpi: 300
+
+Para mais informações sobre ajustes de controle de chunk, veja o `Anexo I` ao final deste documento.
+
+## Tabela geradas por modelização
+
+Aqui podemos inserir tabelas geradas por modelização, tal como a @tbl-coef dos coeficientes de um modelo linear . Para isso, é preciso usar o pacote `jtools` [@jtools].
+
+```{r}
+#| label: tbl-coef
+#| tbl-cap: "Tabela de coeficientes do modelo"
+#| tbl-pos: H
+
+modelo_lm <- caranguejo %>%
+  filter(estacao == "Chuvosa", local == "Ajuruteua") %>%
+  lm(lc ~ cc, data = .)
+
+summ(modelo_lm)$coeftable|> kbl(booktabs = T) |> 
+  kable_paper("hover", full_width = F, latex_options =  'hold_position')
+```
+
+A @tbl-anova é representa a forma tradicional de mostrar os resultados de uma ANOVA.
+
+```{r}
+#| label: tbl-anova
+#| tbl-cap: Anova para a largura da carapaça em função do sexo
+#| tbl-pos: H
+
+modelo_lm <- caranguejo %>%
+  filter(estacao == "Chuvosa", local == "Ajuruteua") %>%
+  aov(data = ., lc ~ sexo)
+
+res <- anova(modelo_lm)
+gt(res)
+```
+
+## **Resultado não exibíveis**
+
+Aqui foi incluído um chunk para servir apenas para testes de comandos e saídas de resultados, mas o mesmo pode não ser incluido no documento (use `#| include: false`). Estes códigos também servem para fazer a verificação de pressupostos estatísticos e outras análises adicionais.
+
+```{r}
+#| include: true
+
+# Este chunk não será incluído na análise. 
+# Serve apenas testar comando e resultados. 
+# A opção incluse: false deve ser colocada.
+
+library(vistributions)
+vistributions::vdist_f_perc(0.95, num_df = 3, den_df = 12)
+```
+
+## Referências cruzadas
+
+É muito fácil inserir referências cruzadas nos seus documentos, sendo necessário um identificador específico (ou *label* no caso de chunks) para seu objeto, sendo geralmente feito com o símbolo `#` ; no caso de chunks, use a opção `#| label:`. A inserção começa sempre com operador \@. Para ter pleno funcionamento de todas as referências cruzadas, tenha a versão mais recente do [Quarto](https://quarto.org/docs/download/) instalada.
+
+-   Referência cruzada a tabela: @tbl-transf
+-   Referência cruzada a figuras:
+    -   Figura inserida sem chunk: @fig-crab;
+    -   Figura gerada por chunk: @fig-ucides;
+    -   Só o número da figura: [-@fig-ucides];
+    -   Forma personalizada: [Fig. @fig-ucides]
+-   Referência cruzada a seção: @sec-intro
+-   Referência cruzada a equação: [@eq-peso_comp]
+
+# Organização de Projeto R
+
+Esta seção se constitui de dicas adicionais para seus projetos de análise para que você aprenda a realizar de forma eficiente e segura as suas análises. Também você deve aprender a trabalhar de forma colaboraiva em projetos de programação e ostraremos como fazer isso.
+
+## Organização das pastas do projeto
+
+Seu projeto deve estar contido numa pasta (pasta raiz e que dá nome ao projeto), na qual se recomenda conter todos os seus arquivos de código (`*.R, *.Rmd, *.qmd`, etc) e as seguintes subpastas que ajudarão na organização de arquivos:
+
+-   **dados** - Para receber seus arquivos de dados no formato `*.csv`(recomendável) ou quaisquer outros formatos (.xlsx, \*.txt, etc);
+-   **imagens** - Para conter figuras de fora da programação, como logomarcas, fotos, desenhos, etc;
+-   **graficos** - Para conter os gráficos gerados por seus códigos de programação.
+
+Abaixo vemos a @fig-est-arquivos, a qual ilustra esse modo de organização. Também vemos o código que importa essa imagem a partir da subpasta `imagens`. Observe que criei uma pasta chamada `functions` para conter suas próprias funções.
+
+```{r}
+#| label: fig-est-arquivos
+#| out-width: "50%"
+#| fig-cap: "Estrutura de organização de arquivos num projeto"
+#| fig-align: "center"
+
+
+knitr::include_graphics("images/estrutura-arquivo_port.png")
+```
+
+## Local para salvar os gráficos gerados
+
+Para seguir essa metodologia de organização, gráficos gerados ao longo de seu trabalho podem ser salvos conforme definido acima no chunk de `setup`, no fig.path, e também como apresentado mais uma vez abaixo:
+
+```{r}
+#| echo: true
+
+# Todas as figuras serão salvas no caminho específicado 
+# em fig.path
+
+knitr::opts_chunk$set(fig.path = "plots/")
+```
+
+## Organize os dados de forma eficaz em uma planilha
+
+Agora que você está bem organizado para conduzir sua análise de dados, ainda falta um passo: criar o arquivo de dados! Esta é uma etapa essencial e, ao adotar algumas regras simples, você evitará perder tempo precioso ao importar ou até mesmo arrancar os cabelos reformatando os dados em R. Os dois pontos principais dessas regras simples são:
+
+-   **Usando o formato tidy conforme @fig-tidy.**
+    -   Trata-se de organizar seus dados com:
+        -   uma linha por observação
+        -   uma coluna por variável
+        -   o valor numérico na interseção de linhas e colunas
+
+```{r}
+#| label: fig-tidy
+#| out-width: "80%"
+#| fig-cap: "Forma de organizar um conjuntos de dados"
+#| fig-link: https://r4ds.had.co.nz/tidy-data.html
+#| fig-align: "center"
+
+
+knitr::include_graphics(here("images", "tidy.png"))
+```
+
+-   **Armazenamento de dados em formato csv.**
+
+O formato csv é recomendado porque não depende de nenhum software específico, ao contrário do formato xlsx que é específico do Excel. Assim, em caso de perda de sua licença do Excel, você ainda poderá acessar seus dados. E da mesma forma, em caso de colaboração, todos poderão abrir um arquivo csv usando softwares gratuitos, como o LibreOffice e WPS Office, por exemplo.
+
+## Instale o git para scripts de versão em Quarto
+
+Para ficar mais organizado, e não ter uma pasta de trabalho saturada com diferentes versões do mesmo script (em Quarto!) é possível fazer versionamento do R Studio, com o programa `git`.
+
+Na prática, isso significa que você poderá tirar um instantâneo do seu script a qualquer momento (no final de sua sessão de trabalho ou antes de uma grande mudança, por exemplo). Você deve acompanhar este "instantâneo", que se chama "commit", com uma mensagem explicativa (destinada a você).
+
+Os requistos para você conseguir começar a usar o Git e Github no RStudio são os seguintes:
+
+-   Abrir uma conta do GitHub;
+-   Ter o git instalado (veja este [link](https://git-scm.com/) para download).
+-   Configurar o Rstudio para fazer versionando de códigos usando o pacote `usethis`
+-   Criar um token do Github
+
+Para uma rápida configuração do RStudio para usar Git/Github, recomendamos o texto de [Análise Macro](https://analisemacro.com.br/data-science/conectando-git-github-e-rstudio-em-3-passos/). Para uma compreensão maior do mundo do Git, uma excelente opção de livro é **Happy Git and GitHub for the useR**[^1], de Jennifer Bryan**.** Após realizar a configuração, é muito fácil disponibilizar seu projeto no Github:
+
+[^1]: *Happy Git and GitHub for the useR.*https://happygitwithr.com/
+
+-   Para se conectar com o git, digite no terminal : `usethis::use_git()`.
+-   Em seguida, digite: `usethis::use_github()`, para criar o repositório no site do Github.
+
+# Conclusão
+
+Este modelo de projeto de arquivo.qmd atende aos objetivos iniciais de se criar um documento no formato científico. Ele pode ser adaptado a jornais e revistas, assim como trabalhos acadêmicos. A aparência final do documento ficou muito boa, sendo limpa, clara e objtiva e cada item apresentou boa qualidade gráfica ou visual. Melhorias podem ser feitas, a fim de cobrir o maior número de tipos de publicações.
+
+# Referências Bibliográficas
+
+<!--#    É importante forçar as referências parecerem por aqui. Vá no menu Insert /div e em ID digite #refs -->
+
+::: {#refs}
+:::
+
+\newpage
+
+# Anexo I {.unnumbered}
+
+**Opções de Controle dos Chunks**
+
+Nos documentos dinâmicos criados com ferramentas como Quarto, *chunks* de código podem ser ajustados por meio de diversas opções, otimizando a exibição de código e resultados. Essas configurações oferecem flexibilidade na composição do documento, alinhando a apresentação dos dados e análises às necessidades dos usuários. As opções essenciais resumidas incluem:
+
+-   **eval** (**`false`**): Desativa a execução do *chunk*, exibindo apenas resultados prévios.
+-   **include** (**`false`**): Bloqueia a avaliação e exibição do *chunk*, ideal para testes ocultos.
+-   **echo** (**`false`**): Mostra os resultados sem o código, para um documento mais limpo.
+-   **message** (**`false`**): Omite mensagens durante a execução, mantendo o foco nos resultados.
+-   **warning** (**`false`**): Suprime avisos gerados, evitando interrupções na leitura.
+-   **fig.cap** (**`"legenda"`**): Adiciona legenda às figuras, aumentando a compreensão.
+-   **fig.align** (**`"center"`**): Alinha figuras ao centro, melhorando a estética.
+-   **cache** (**`true`**): Habilita o armazenamento em cache, acelerando a compilação.
+-   **results** (**`"hide"`**): Oculta os resultados, permitindo maior controle sobre o que é mostrado.
+-   **out.width** e **out.height** (**`"50%"`**): Define tamanho das figuras, ajustando ao conteúdo.
+-   **label** (**`"etiqueta"`**): Nomeia o *chunk* para fácil referência, organizando o documento.
+
+Para mais informações sobre como usar as opções de chunk, consulte as várias referências que podem ser encontradas na internet, como este `<a href="`{=html}https://quarto.org/docs/guide"`target="_blank">`{=html}Guia</a> do site oficial do Quarto.
